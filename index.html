@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16294B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="영어 3문장">
+<title>매일 영어 3문장 · 하루 10분</title>
+<style>
+  :root{
+    --bg:#F2F6FC; --card:#FFFFFF; --ink:#16233C; --ink2:#66748D; --line:#DEE7F3;
+    --navy:#16294B; --navy2:#22437D; --accent:#2B5AC7; --accent2:#1E448F; --accent-soft:#E9F0FE;
+    --listen:#0F6E9C; --listen-soft:#E3F2F8; --listen-line:#CBE6F2;
+    --ok:#1D7A56; --ok-soft:#E4F4EC; --bad:#B23F3A; --bad-soft:#FBEBEA;
+    --gold:#A2762A; --soft:#F6F9FD;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);
+    font-size:16px;line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:calc(98px + env(safe-area-inset-bottom));
+  }
+  .app{max-width:480px;margin:0 auto;padding:0 16px}
+
+  /* ---------- hero ---------- */
+  .hero{
+    margin:16px 0 4px;padding:18px 18px 16px;border-radius:22px;
+    background:linear-gradient(135deg,#152849 0%,#274A8E 62%,#3563B8 100%);
+    color:#fff;box-shadow:0 8px 24px rgba(22,41,75,.22);
+  }
+  .hero-top{display:flex;align-items:center;gap:8px}
+  .flag{font-size:22px;line-height:1}
+  .hero-kicker{font-size:10.5px;font-weight:800;letter-spacing:.12em;color:rgba(255,255,255,.72)}
+  .hero h1{margin:6px 0 0;font-size:23px;font-weight:800;letter-spacing:-.03em;line-height:1.25}
+  .hero p{margin:2px 0 0;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.78)}
+
+  /* ---------- day tabs ---------- */
+  .tabsbar{
+    position:sticky;top:0;z-index:20;
+    margin:0 -16px;padding:9px 16px 9px;
+    background:rgba(242,246,252,.94);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(222,231,243,.8);
+  }
+  .daytabs{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0;scrollbar-width:none}
+  .daytabs::-webkit-scrollbar{display:none}
+  .daychip{
+    flex:none;position:relative;
+    border:1.5px solid var(--line);background:var(--card);color:var(--ink2);
+    border-radius:14px;padding:8px 13px;text-align:left;
+    font-family:inherit;font-size:13px;font-weight:800;line-height:1.25;
+    min-height:46px;cursor:pointer;
+  }
+  .daychip small{display:block;font-size:10.5px;font-weight:600;color:var(--ink2);opacity:.92;margin-top:2px}
+  .daychip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .daychip.on small{color:rgba(255,255,255,.82)}
+  .daychip.touched{box-shadow:inset 3px 0 0 0 var(--ok)}
+  .daychip.on.touched{box-shadow:none}
+
+  /* ---------- generic ---------- */
+  main{padding-top:14px}
+  .card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:13px;box-shadow:0 2px 10px rgba(22,41,75,.06)}
+  .panel-head{background:var(--card);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(22,41,75,.06)}
+  .kicker{font-size:11.5px;font-weight:800;color:var(--accent);letter-spacing:.04em}
+  .panel-head h2{margin:3px 0 4px;font-size:19px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .panel-head p{margin:0;font-size:13.5px;color:var(--ink2);font-weight:500}
+  .plan{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+  .plan span{font-size:11.5px;background:var(--accent-soft);color:var(--accent2);padding:4px 9px;border-radius:999px;font-weight:800}
+  .statrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .stat{font-size:11.5px;background:var(--soft);border:1px solid var(--line);color:var(--ink2);padding:4px 9px;border-radius:999px;font-weight:700}
+  .stat b{color:var(--ink);font-weight:800}
+  .stat.done{background:var(--ok-soft);border-color:#CAE8D9;color:#175E43}
+
+  /* ---------- sentence cards ---------- */
+  .sent{padding:16px 16px 15px}
+  .sent-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+  .sent-no{display:flex;align-items:center;gap:8px}
+  .num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+  .num.k{background:var(--ok)}
+  .sent-label{font-size:11px;font-weight:800;color:var(--ink2);letter-spacing:.04em}
+  .listen{
+    font-family:inherit;font-size:12px;font-weight:800;color:#0B5A80;
+    background:var(--listen-soft);border:1.5px solid var(--listen-line);border-radius:999px;
+    padding:7px 11px;min-height:36px;cursor:pointer;white-space:nowrap;touch-action:manipulation;
+  }
+  .listen:active{transform:translateY(1px)}
+  .listen.on{background:var(--listen);border-color:var(--listen);color:#fff}
+  .en{margin:0 0 8px;font-size:18px;font-weight:800;line-height:1.5;letter-spacing:-.01em;color:#12203A;word-break:break-word}
+  .en mark{background:linear-gradient(transparent 56%,#D5E3FF 56%);color:#173B86;padding:0 1px;border-radius:2px}
+  .ko{margin:0;font-size:15px;font-weight:700;color:#33415C;line-height:1.5}
+  .ko-alt{display:inline;font-size:13px;font-weight:600;color:var(--ink2)}
+  .when{margin:9px 0 0;font-size:12.5px;font-weight:600;color:#7A889F;line-height:1.55}
+  .when b{color:#5B6B85;font-weight:800}
+  .keyline{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px}
+  .key{
+    display:inline-block;font-size:12.5px;font-weight:800;color:var(--accent2);
+    background:var(--accent-soft);border:1px solid #D2E0FA;border-radius:9px;padding:4px 9px;
+  }
+  .tip{background:var(--soft);border-left:3px solid #A8C0F0;border-radius:0 10px 10px 0;padding:9px 12px;font-size:12.5px;color:#3B4B66;font-weight:600;margin-top:11px;line-height:1.55}
+  .tip b{font-weight:800;color:#243A5E}
+
+  .btn{
+    font-family:inherit;border:0;border-radius:15px;padding:15px 16px;font-size:15.5px;font-weight:800;
+    min-height:54px;width:100%;background:var(--accent);color:#fff;cursor:pointer;
+    box-shadow:0 5px 16px rgba(43,90,199,.24);touch-action:manipulation;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+  .btn.ok{background:var(--ok);box-shadow:0 5px 16px rgba(29,122,86,.22)}
+  .btn.navy{background:var(--navy);box-shadow:0 5px 16px rgba(22,41,75,.22)}
+  .btn.soft{background:var(--soft);color:var(--ink2);border:1.5px solid var(--line);box-shadow:none}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .lead{margin:0 0 12px;font-size:13px;color:var(--ink2);font-weight:500;line-height:1.6}
+
+  /* ---------- flashcards ---------- */
+  .fc-top{margin-bottom:12px}
+  .fc-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .fc-bar .cnt{font-size:11.5px;font-weight:800;color:var(--ink2)}
+  .progress{height:7px;border-radius:999px;background:#E7EEF9;overflow:hidden}
+  .progress i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#2B5AC7,#5A8BE8);transition:width .3s ease}
+  .fc-scene{perspective:900px;margin-bottom:13px}
+  .fc{
+    background:#fff;border-radius:22px;padding:22px 18px;min-height:296px;
+    box-shadow:0 3px 14px rgba(22,41,75,.08);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    cursor:pointer;border:1.5px solid transparent;transform-origin:center;
+  }
+  .fc.anim{animation:fcflip .28s ease-out}
+  @keyframes fcflip{from{transform:rotateY(74deg);opacity:.35}to{transform:rotateY(0);opacity:1}}
+  .fc-front{border-color:#E4ECF9;background:linear-gradient(170deg,#FFFFFF 0%,#F7FAFF 100%)}
+  .fc-back{border-color:#D3E2FA;background:linear-gradient(170deg,#FFFFFF 0%,#EFF5FF 100%)}
+  .subjchip{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#5F7392;background:#EDF3FC;padding:4px 10px;border-radius:999px}
+  .fc-ko{font-size:21px;font-weight:800;color:#20314F;letter-spacing:-.02em;line-height:1.42;margin-top:14px;word-break:keep-all}
+  .fc-when{font-size:12px;font-weight:600;color:#7A889F;margin-top:9px;line-height:1.5;max-width:300px}
+  .fc-tap{font-size:11.5px;font-weight:800;color:var(--accent);margin-top:18px}
+  .fc-label{font-size:10.5px;font-weight:800;color:var(--accent);letter-spacing:.1em}
+  .fc-answer{font-size:19px;font-weight:800;color:#11203C;letter-spacing:-.01em;line-height:1.45;margin-top:9px;word-break:break-word}
+  .fc-answer mark{background:linear-gradient(transparent 56%,#D5E3FF 56%);color:#173B86;border-radius:2px}
+  .fc .key{margin-top:12px}
+  .fc .tip{text-align:left;width:100%;margin-top:12px}
+  .fc .listen{margin-top:12px}
+  .covered{font-size:11.5px;color:var(--ink2);font-weight:700;text-align:center;margin:2px 0 0}
+  .navrow{display:grid;grid-template-columns:52px 1fr 52px;gap:8px;align-items:stretch}
+  .navbtn{
+    font-family:inherit;border:1.5px solid var(--line);background:#fff;color:var(--ink);
+    border-radius:15px;font-size:17px;font-weight:800;min-height:54px;cursor:pointer;touch-action:manipulation;
+  }
+  .navbtn:disabled{opacity:.35}
+  .knownbtn{
+    font-family:inherit;border:0;border-radius:15px;font-size:15px;font-weight:800;min-height:54px;cursor:pointer;
+    background:var(--soft);color:#3D4E6B;border:1.5px solid var(--line);touch-action:manipulation;
+  }
+  .knownbtn.on{background:var(--ok);border-color:var(--ok);color:#fff;box-shadow:0 5px 16px rgba(29,122,86,.2)}
+  .done-screen{text-align:center;padding:22px 16px}
+  .done-emoji{font-size:40px;line-height:1;margin-bottom:6px}
+  .done-screen h3{font-size:17px;margin:0 0 6px;font-weight:800}
+  .done-screen p{font-size:13px;color:var(--ink2);font-weight:600;margin:0 0 14px}
+  .done-screen .btn{margin-top:8px}
+
+  /* ---------- quiz ---------- */
+  .q{background:#fff;border-radius:18px;padding:14px;margin-bottom:11px;border:1.5px solid transparent;box-shadow:0 2px 10px rgba(22,41,75,.06)}
+  .q.ok{border-color:#BCE3CC}
+  .q.bad{border-color:#F0C2BD}
+  .q-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .qnum{font-size:11px;font-weight:800;color:var(--ink2);letter-spacing:.06em}
+  .qmark{font-size:13px;font-weight:800}
+  .qmark.ok{color:var(--ok)}
+  .qmark.bad{color:var(--bad)}
+  .stem{font-size:15px;font-weight:700;line-height:2.2;margin:4px 0 8px;letter-spacing:-.01em;color:#1D2B45}
+  .blank{
+    font-family:inherit;font-size:16px;line-height:1.25;font-weight:800;color:var(--accent);
+    background:var(--soft);border:0;border-bottom:2px solid #C9D6E9;border-radius:8px 8px 2px 2px;
+    padding:6px 7px;text-align:center;min-height:38px;margin:0 2px;
+    vertical-align:middle;-webkit-appearance:none;appearance:none;
+  }
+  .blank:focus{outline:none;border-color:var(--accent);background:var(--accent-soft)}
+  .blank.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+  .blank.bad{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+  .qacts{display:flex;gap:7px;flex-wrap:wrap}
+  .mini{
+    font-family:inherit;font-size:12px;font-weight:800;color:var(--ink2);
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 12px;min-height:36px;cursor:pointer;
+  }
+  .mini.on{background:var(--accent-soft);border-color:#C9DAF8;color:var(--accent2)}
+  .hint{background:#FDF6E3;border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:600;color:#7A5E20;margin-top:9px;line-height:1.5}
+  .opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .opt{
+    font-family:inherit;font-size:13.5px;font-weight:800;color:var(--ink);
+    background:var(--soft);border:1.5px solid var(--line);border-radius:11px;padding:8px 14px;min-height:42px;cursor:pointer;
+    touch-action:manipulation;
+  }
+  .opt.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+  .res{border-radius:12px;padding:9px 12px;font-size:12.5px;font-weight:600;margin-top:9px;line-height:1.55}
+  .res.ok{background:var(--ok-soft);color:#175E43}
+  .res.bad{background:var(--bad-soft);color:#8E2F29}
+  .res b{font-weight:800}
+  .res .full{margin-top:3px;opacity:.95}
+  .res .expl{margin-top:3px;opacity:.85}
+  .score{
+    background:linear-gradient(140deg,#1B3462,#2F5DB4);color:#fff;border-radius:20px;
+    padding:18px 16px;text-align:center;margin-bottom:13px;box-shadow:0 6px 20px rgba(27,52,98,.22);
+  }
+  .score .big{font-size:36px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+  .score .big small{font-size:16px;font-weight:800;opacity:.85}
+  .score .msg{font-size:13px;font-weight:700;opacity:.95;margin-top:2px}
+  .score .sub{font-size:11.5px;font-weight:600;opacity:.8;margin-top:4px}
+  .quizfoot{margin-top:14px}
+
+  .foot{text-align:center;font-size:11px;color:#9AA8BE;font-weight:600;padding:8px 0 10px;line-height:1.6}
+
+  /* ---------- bottom nav ---------- */
+  .modenav{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;
+    padding:8px 12px calc(9px + env(safe-area-inset-bottom));
+    background:rgba(242,246,252,.94);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border-top:1px solid rgba(222,231,243,.9);
+  }
+  .modenav-inner{
+    max-width:456px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+    background:#fff;border-radius:17px;padding:5px;box-shadow:0 3px 14px rgba(22,41,75,.09);
+  }
+  .mode-btn{
+    font-family:inherit;border:0;background:transparent;border-radius:13px;
+    padding:7px 2px;display:flex;flex-direction:column;align-items:center;gap:1px;
+    font-size:11.5px;font-weight:800;color:var(--ink2);cursor:pointer;min-height:50px;justify-content:center;
+    touch-action:manipulation;
+  }
+  .mode-btn .ic{font-size:15px;line-height:1.1}
+  .mode-btn.on{background:var(--navy);color:#fff}
+
+  .toast{
+    position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));
+    transform:translate(-50%,10px);opacity:0;pointer-events:none;
+    background:rgba(22,41,75,.94);color:#fff;font-size:12.5px;font-weight:700;
+    padding:10px 16px;border-radius:999px;z-index:60;max-width:86vw;text-align:center;
+    transition:opacity .22s ease,transform .22s ease;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:360px){
+    .fc-ko{font-size:19px}
+    .fc-answer{font-size:17px}
+    .stem{font-size:14px}
+    .en{font-size:17px}
+  }
+</style>
+</head>
+<body>
+<noscript><div style="background:#FBEBEA;color:#8E2F29;padding:12px 16px;font-size:13px;font-weight:700;text-align:center">자바스크립트가 꺼져 있어요. Safari에서 이 파일을 열어 주세요.</div></noscript>
+<div class="app">
+  <header class="hero">
+    <div class="hero-top">
+      <span class="flag" aria-hidden="true">🇺🇸</span>
+      <span class="hero-kicker">DAILY ENGLISH · B1–B2</span>
+    </div>
+    <h1>매일 영어 3문장</h1>
+    <p>뜻만 보고 영어로 말하기 · 하루 10분</p>
+  </header>
+
+  <div class="tabsbar">
+    <div class="daytabs" id="dayTabs" role="tablist" aria-label="일차 선택"></div>
+  </div>
+
+  <main id="main"></main>
+
+  <footer class="foot">진행 상황은 이 기기에만 저장돼요 · 발음은 기기의 영어 음성을 사용해요</footer>
+</div>
+
+<nav class="modenav" aria-label="학습 모드">
+  <div class="modenav-inner" id="modeTabs"></div>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     DAYS — 하루치 학습 데이터. 새 회차는 이 배열 끝에 객체 하나만 추가하면
+     상단 탭·플래시카드·퀴즈·진행도가 자동으로 함께 늘어납니다.
+
+     sentences: en(영어 문장) / hl(강조할 구간, 선택) / ko(한국어 뜻)
+                koAlt(다른 뉘앙스의 뜻, 선택) / when(이럴 때 써요)
+                key(핵심 표현) / tip(뉘앙스 팁)
+     quiz: text의 {} 가 빈칸, answers는 빈칸별 정답 배열(앞의 값이 대표 정답),
+           options(선택지, 선택 사항), hint(힌트), expl(해설)
+     ============================================================ */
+  var DAYS = [
+    {
+      id: "d1",
+      label: "1일차",
+      date: "2026-11-22",
+      title: "이해 · 일정 · 연락",
+      summary: "wrap one's head around · push back · touch base — 오늘 바로 써볼 세 표현",
+      sentences: [
+        {
+          en: "I'm still trying to wrap my head around it.",
+          hl: "wrap my head around",
+          ko: "아직 상황을 파악하는 중이에요.",
+          koAlt: "(머리로 정리하는 중이에요.)",
+          when: "새로 바뀐 업무 방식이나 복잡한 안건을 아직 다 이해하지 못했을 때",
+          key: "wrap one's head around ~",
+          tip: "낯설거나 복잡한 일을 이해·소화하려고 애쓸 때 일상과 업무 모두에서 아주 자주 씁니다."
+        },
+        {
+          en: "Could we push the meeting back by 30 minutes?",
+          hl: "push the meeting back",
+          ko: "회의를 30분만 뒤로 미룰 수 있을까요?",
+          koAlt: "(회의를 30분 늦춰도 될까요?)",
+          when: "회의나 약속 시간을 조금 늦추자고 정중하게 물어볼 때",
+          key: "push ~ back (by 시간)",
+          tip: "일정을 뒤로 미룰 때 쓰는 표현입니다. 반대로 앞당길 때는 move ~ up을 씁니다."
+        },
+        {
+          en: "Let's touch base early next week to finalize the details.",
+          hl: "touch base",
+          ko: "세부 사항을 마무리하기 위해 다음 주 초에 다시 얘기하죠.",
+          koAlt: "(다음 주 초에 다시 연락해서 마무리해요.)",
+          when: "짧게 다시 연락해 현황을 맞추자고 제안할 때",
+          key: "touch base",
+          tip: "잠시 연락해 현황을 맞추거나 짧게 이야기 나눈다는 비즈니스 단골 표현입니다."
+        }
+      ],
+      quiz: [
+        {
+          text: "I'm still trying to {} my head around it.",
+          answers: [["wrap"]],
+          options: [["wrap", "break", "turn"]],
+          hint: "‘머리를 감싸 쥐다’라는 이미지의 구동사예요.",
+          expl: "wrap one's head around ~ = 복잡한 내용을 이해하려고 머리를 짜내다. 아직 이해가 안 될 때 still trying to로 자주 말해요."
+        },
+        {
+          text: "I can't wrap my {} around this contract.",
+          answers: [["head"]],
+          options: [["head", "mind", "brain"]],
+          hint: "wrap my ___ around ~ : 신체 부위 하나가 고정으로 들어가요.",
+          expl: "wrap my head around ~ 처럼 소유격 + head가 굳어진 표현이에요. mind나 brain은 쓰지 않습니다."
+        },
+        {
+          text: "Could we push the meeting {} by 30 minutes?",
+          answers: [["back"]],
+          options: [["back", "up", "off"]],
+          hint: "시간을 ‘뒤로’ 미루는 방향이에요.",
+          expl: "push ~ back = 일정을 뒤로 미루다. 반대로 앞당길 때는 move ~ up을 써요."
+        },
+        {
+          text: "The client asked us to {} the call back by an hour.",
+          answers: [["push"]],
+          options: [["push", "pull", "take"]],
+          hint: "‘미루다’의 동사 자리예요.",
+          expl: "push the call back by an hour = 통화를 한 시간 미루다. push + 대상 + back + by 시간 순서로 기억하세요."
+        },
+        {
+          text: "Let's {} base early next week to finalize the details.",
+          answers: [["touch"]],
+          options: [["touch", "keep", "hold"]],
+          hint: "‘잠시 연락해 현황을 맞추다’라는 표현의 첫 단어예요.",
+          expl: "touch base = 짧게 연락해 상황을 맞추다. touch base with + 사람 형태로도 자주 씁니다."
+        },
+        {
+          text: "Can we {} the kickoff up to Monday?",
+          answers: [["move"]],
+          options: [["move", "push", "get"]],
+          hint: "일정을 앞당길 때 쓰는 동사예요.",
+          expl: "move ~ up = 일정을 앞당기다. push ~ back의 반대 표현이라 함께 익혀 두면 좋아요."
+        }
+      ]
+    }
+  ];
+
+  /* ============ 상태 ============ */
+  var K_STATE = "engDaily.v1.state";
+  var K_PROG = "engDaily.v1.prog";
+
+  var state = { day: 0, mode: "today" };
+  var prog = {};
+  var quiz = null;
+  var cards = null;
+  var dayIdx = {};
+
+  for (var di = 0; di < DAYS.length; di++) dayIdx[DAYS[di].id] = di;
+  for (var di2 = 0; di2 < DAYS.length; di2++) {
+    if (!DAYS[di2].id) DAYS[di2].id = "d" + (di2 + 1);
+    if (!DAYS[di2].label) DAYS[di2].label = (di2 + 1) + "일차";
+  }
+
+  function safeGet(k, def) {
+    try {
+      var raw = window.localStorage.getItem(k);
+      if (!raw) return def;
+      return JSON.parse(raw);
+    } catch (e) { return def; }
+  }
+  function safeSet(k, v) {
+    try { window.localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* 저장 불가 환경이면 조용히 넘어감 */ }
+  }
+  function dayId() { return DAYS[state.day].id; }
+  function curDay() { return DAYS[state.day]; }
+
+  function loadAll() {
+    var s = safeGet(K_STATE, null);
+    if (s && typeof s.day === "number" && s.day >= 0 && s.day < DAYS.length) state.day = s.day;
+    else state.day = DAYS.length - 1;
+    if (s && s.mode && ["today", "cards", "quiz"].indexOf(s.mode) >= 0) state.mode = s.mode;
+    var p = safeGet(K_PROG, null);
+    prog = (p && typeof p === "object") ? p : {};
+    for (var i = 0; i < DAYS.length; i++) progOf(DAYS[i].id);
+  }
+  function saveState() { safeSet(K_STATE, { day: state.day, mode: state.mode }); }
+  function saveProg() { safeSet(K_PROG, prog); }
+
+  function progOf(id) {
+    if (!prog[id] || typeof prog[id] !== "object") prog[id] = {};
+    var p = prog[id];
+    if (!Array.isArray(p.known)) p.known = [];
+    if (typeof p.best !== "number") p.best = 0;
+    if (typeof p.last !== "number" && p.last !== null) p.last = null;
+    return p;
+  }
+
+  /* ============ 유틸 ============ */
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function escAttr(s) {
+    return esc(s).replace(/"/g, "&quot;");
+  }
+  function norm(s) {
+    var v = String(s == null ? "" : s).toLowerCase().trim();
+    v = v.replace(/[\u2018\u2019\u02BC]/g, "").replace(/[\u201C\u201D]/g, "");
+    v = v.replace(/['`"]/g, "");
+    v = v.replace(/[.,!?;:]/g, "");
+    v = v.replace(/\s+/g, " ");
+    return v;
+  }
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function highlight(en, hl) {
+    var out = esc(en);
+    if (!hl) return out;
+    var h = esc(hl);
+    var at = out.indexOf(h);
+    if (at < 0) return out;
+    return out.slice(0, at) + "<mark>" + h + "</mark>" + out.slice(at + h.length);
+  }
+
+  var toastTimer = null;
+  function toast(msg) {
+    var el = document.getElementById("toast");
+    if (!el) return;
+    el.textContent = msg;
+    el.className = "toast show";
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.className = "toast"; }, 2300);
+  }
+
+  /* ============ 발음 (Web Speech API) ============ */
+  var voiceCache = null;
+  var speakingBtn = null;
+
+  function canSpeak() {
+    return !!(window && window.speechSynthesis && typeof window.SpeechSynthesisUtterance === "function");
+  }
+  function pickVoice() {
+    try {
+      var all = window.speechSynthesis.getVoices() || [];
+      if (!all.length) return null;
+      if (!voiceCache) {
+        var best = null;
+        for (var i = 0; i < all.length; i++) {
+          var v = all[i];
+          var lg = String(v.lang || "").replace("_", "-").toLowerCase();
+          if (lg.indexOf("en-us") === 0) { best = v; if (v.localService) break; }
+        }
+        if (!best) {
+          for (var j = 0; j < all.length; j++) {
+            if (String(all[j].lang || "").toLowerCase().indexOf("en") === 0) { best = all[j]; break; }
+          }
+        }
+        voiceCache = best;
+      }
+      return voiceCache;
+    } catch (e) { return null; }
+  }
+  function makeUtterance(text) {
+    var u = new window.SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.9;
+    u.pitch = 1;
+    var v = pickVoice();
+    if (v) u.voice = v;
+    return u;
+  }
+  function setSpeakingBtn(btn, on) {
+    if (speakingBtn && speakingBtn !== btn) {
+      speakingBtn.classList.remove("on");
+      if (speakingBtn.getAttribute("data-label")) speakingBtn.textContent = speakingBtn.getAttribute("data-label");
+    }
+    if (!btn) { speakingBtn = null; return; }
+    if (!btn.getAttribute("data-label")) btn.setAttribute("data-label", btn.textContent);
+    if (on) {
+      btn.classList.add("on");
+      btn.textContent = "🔊 재생 중";
+      speakingBtn = btn;
+    } else {
+      btn.classList.remove("on");
+      btn.textContent = btn.getAttribute("data-label");
+      speakingBtn = null;
+    }
+  }
+  function speakText(text, btn) {
+    if (!canSpeak()) {
+      toast("이 브라우저에서는 발음 듣기를 지원하지 않아요. 소리 내어 읽어 보세요.");
+      return;
+    }
+    try {
+      window.speechSynthesis.cancel();
+      var u = makeUtterance(text);
+      u.onend = function () { setSpeakingBtn(btn, false); };
+      u.onerror = function () { setSpeakingBtn(btn, false); };
+      window.speechSynthesis.speak(u);
+      setSpeakingBtn(btn, true);
+    } catch (e) {
+      setSpeakingBtn(btn, false);
+      toast("발음 재생을 시작할 수 없어요. 잠시 뒤 다시 눌러 주세요.");
+    }
+  }
+  function speakSentence(i, btn) {
+    var s = curDay().sentences[i];
+    if (!s) return;
+    speakText(s.en, btn);
+  }
+  function speakDay(btn) {
+    var list = curDay().sentences;
+    if (!canSpeak()) {
+      toast("이 브라우저에서는 발음 듣기를 지원하지 않아요. 소리 내어 읽어 보세요.");
+      return;
+    }
+    try {
+      window.speechSynthesis.cancel();
+      var last = null;
+      for (var i = 0; i < list.length; i++) {
+        var u = makeUtterance(list[i].en);
+        if (i === list.length - 1) {
+          u.onend = function () { setSpeakingBtn(btn, false); };
+          u.onerror = function () { setSpeakingBtn(btn, false); };
+        }
+        last = u;
+        window.speechSynthesis.speak(u);
+      }
+      if (last) setSpeakingBtn(btn, true);
+    } catch (e) {
+      setSpeakingBtn(btn, false);
+      toast("발음 재생을 시작할 수 없어요. 잠시 뒤 다시 눌러 주세요.");
+    }
+  }
+
+  /* ============ 목표 ============ */
+  function isKnown(i) { return progOf(dayId()).known.indexOf(i) >= 0; }
+  function knownCount() {
+    var p = progOf(dayId());
+    var n = 0;
+    for (var i = 0; i < curDay().sentences.length; i++) if (p.known.indexOf(i) >= 0) n++;
+    return n;
+  }
+  function goalMet() {
+    var p = progOf(dayId());
+    return knownCount() === curDay().sentences.length && p.best >= curDay().quiz.length;
+  }
+  function celebrateIfDone() {
+    var p = progOf(dayId());
+    if (goalMet() && !p.celebrated) {
+      p.celebrated = true;
+      saveProg();
+      toast("오늘 목표 달성! 3문장을 다 익혔어요 🎉");
+    }
+  }
+
+  /* ============ 헤더 / 탭 ============ */
+  function renderDayTabs() {
+    var el = document.getElementById("dayTabs");
+    var h = "";
+    for (var i = 0; i < DAYS.length; i++) {
+      var d = DAYS[i];
+      var p = progOf(d.id);
+      var touched = (p.best > 0 || p.known.length > 0) ? " touched" : "";
+      h += '<button type="button" class="daychip' + (state.day === i ? " on" : "") + touched + '"' +
+        ' data-day="' + i + '" role="tab" aria-selected="' + (state.day === i ? "true" : "false") + '">' +
+        esc(d.label) + "<small>" + esc(d.title) + "</small></button>";
+    }
+    el.innerHTML = h;
+  }
+
+  function renderModeTabs() {
+    var el = document.getElementById("modeTabs");
+    var modes = [
+      { k: "today", ic: "📖", label: "오늘의 3문장" },
+      { k: "cards", ic: "🔁", label: "플래시카드" },
+      { k: "quiz", ic: "✍️", label: "복습 퀴즈" }
+    ];
+    var h = "";
+    for (var i = 0; i < modes.length; i++) {
+      var m = modes[i];
+      h += '<button type="button" class="mode-btn' + (state.mode === m.k ? " on" : "") + '" data-mode="' + m.k + '"' +
+        ' aria-pressed="' + (state.mode === m.k ? "true" : "false") + '">' +
+        '<span class="ic" aria-hidden="true">' + m.ic + "</span><span>" + m.label + "</span></button>";
+    }
+    el.innerHTML = h;
+  }
+
+  /* ============ 패널 머리 ============ */
+  function panelHeadHTML() {
+    var d = curDay();
+    var p = progOf(dayId());
+    var total = d.sentences.length;
+    var done = goalMet();
+    var h = '<section class="panel-head">';
+    h += '<div class="kicker">' + esc(d.label) + (d.date ? " · " + esc(d.date) : "") + " · 하루 10분</div>";
+    h += "<h2>" + esc(d.title) + "</h2>";
+    h += "<p>" + esc(d.summary) + "</p>";
+    h += '<div class="plan"><span>문장 ' + total + "개</span><span>카드 " + total + "장</span><span>퀴즈 " + d.quiz.length + "문제</span></div>";
+    h += '<div class="statrow">';
+    h += '<span class="stat">퀴즈 최고 <b>' + p.best + "/" + d.quiz.length + "</b></span>";
+    h += '<span class="stat">외운 카드 <b>' + knownCount() + "/" + total + "</b></span>";
+    if (done) h += '<span class="stat done">오늘 목표 달성 ✓</span>';
+    h += "</div></section>";
+    return h;
+  }
+  function renderPanelHead() {
+    var host = document.getElementById("panelHead");
+    if (host) host.innerHTML = panelHeadHTML();
+  }
+
+  /* ============ 오늘의 3문장 ============ */
+  function todayHTML() {
+    var d = curDay();
+    var h = "";
+    h += '<section class="card"><h3 style="margin:0 0 6px;font-size:15.5px;font-weight:800;display:flex;align-items:center;gap:7px">오늘 외울 3문장</h3>';
+    h += '<p class="lead">먼저 소리 내어 두 번 읽고, 뜻을 확인한 뒤 🔊 버튼으로 원어민 발음을 들어 보세요. 아래 플래시카드에서는 뜻만 보고 영어로 떠올립니다.</p>';
+    h += '<button type="button" class="btn navy" data-act="speakall">🔊 세 문장 연속 듣기</button>';
+    h += "</section>";
+
+    for (var i = 0; i < d.sentences.length; i++) {
+      var s = d.sentences[i];
+      var known = isKnown(i);
+      h += '<article class="card sent">';
+      h += '<div class="sent-top"><div class="sent-no"><span class="num' + (known ? " k" : "") + '">' + (i + 1) + "</span>" +
+        '<span class="sent-label">' + (known ? "외운 문장 ✓" : "오늘의 문장") + "</span></div>";
+      h += '<button type="button" class="listen" data-act="speak" data-i="' + i + '" aria-label="' + (i + 1) + '번 문장 발음 듣기">🔊 발음 듣기</button></div>';
+      h += '<p class="en">' + highlight(s.en, s.hl) + "</p>";
+      h += '<p class="ko">' + esc(s.ko) + (s.koAlt ? ' <span class="ko-alt">' + esc(s.koAlt) + "</span>" : "") + "</p>";
+      if (s.when) h += '<p class="when"><b>이럴 때</b> · ' + esc(s.when) + "</p>";
+      h += '<div class="keyline"><span class="key">' + esc(s.key) + "</span></div>";
+      if (s.tip) h += '<div class="tip"><b>팁</b> · ' + esc(s.tip) + "</div>";
+      h += "</article>";
+    }
+
+    h += '<section class="card"><h3 style="margin:0 0 6px;font-size:15.5px;font-weight:800">다음 단계</h3>';
+    h += '<p class="lead">뜻만 보고 영어로 말할 수 있는지 카드로 확인해 보세요. 3장 모두 외우면 퀴즈로 마무리해요.</p>';
+    h += '<div class="btn-row"><button type="button" class="btn ghost" data-act="gotocards">플래시카드</button>' +
+      '<button type="button" class="btn" data-act="gotoquiz">복습 퀴즈</button></div></section>';
+    return h;
+  }
+
+  /* ============ 플래시카드 ============ */
+  function initCards(force) {
+    var d = curDay();
+    if (force || !cards || cards.day !== state.day) {
+      var first = 0;
+      for (var i = 0; i < d.sentences.length; i++) {
+        if (!isKnown(i)) { first = i; break; }
+      }
+      cards = { day: state.day, i: first, flipped: false, anim: false };
+    }
+  }
+
+  function cardsInnerHTML() {
+    var d = curDay();
+    var total = d.sentences.length;
+    var kc = knownCount();
+    var pct = total ? Math.round((kc / total) * 100) : 0;
+    var i = cards.i;
+    var s = d.sentences[i];
+
+    var h = "";
+    h += '<section class="card fc-top"><div class="fc-bar"><span class="kicker">' + (kc >= total ? "카드 완료 ✓" : "뜻 → 영어") + "</span>" +
+      '<span class="cnt">외운 카드 ' + kc + " / " + total + '</span></div><div class="progress"><i style="width:' + pct + '%"></i></div></section>';
+
+    if (!cards.flipped) {
+      h += '<div class="fc-scene"><div class="fc fc-front' + (cards.anim ? " anim" : "") + '" id="fc" data-act="flip" role="button" tabindex="0" aria-label="카드를 눌러 영어 문장 보기">';
+      h += '<span class="subjchip">이 뜻, 영어로 말해 보세요</span>';
+      h += '<div class="fc-ko">' + esc(s.ko) + "</div>";
+      if (s.koAlt) h += '<div class="fc-when">' + esc(s.koAlt) + "</div>";
+      if (s.when) h += '<div class="fc-when">이럴 때 · ' + esc(s.when) + "</div>";
+      h += '<div class="fc-tap">탭해서 영어로 확인 ↻</div>';
+      h += "</div></div>";
+    } else {
+      h += '<div class="fc-scene"><div class="fc fc-back' + (cards.anim ? " anim" : "") + '" id="fc" data-act="flip" role="button" tabindex="0" aria-label="카드를 눌러 뜻 보기">';
+      h += '<span class="fc-label">ENGLISH</span>';
+      h += '<div class="fc-answer">' + highlight(s.en, s.hl) + "</div>";
+      h += '<span class="key">' + esc(s.key) + "</span>";
+      if (s.tip) h += '<div class="tip"><b>팁</b> · ' + esc(s.tip) + "</div>";
+      h += '<button type="button" class="listen" data-act="speak" data-i="' + i + '">🔊 발음 듣기</button>';
+      h += "</div></div>";
+    }
+    cards.anim = false;
+
+    h += '<div class="navrow">';
+    h += '<button type="button" class="navbtn" data-act="prev"' + (i === 0 ? " disabled" : "") + ' aria-label="이전 카드">‹</button>';
+    h += '<button type="button" class="knownbtn' + (isKnown(i) ? " on" : "") + '" data-act="known" aria-pressed="' + (isKnown(i) ? "true" : "false") + '">' +
+      (isKnown(i) ? "외웠어요 ✓" : "외웠어요") + "</button>";
+    h += '<button type="button" class="navbtn" data-act="next"' + (i >= total - 1 ? " disabled" : "") + ' aria-label="다음 카드">›</button>';
+    h += "</div>";
+    h += '<p class="covered">카드를 누르면 영어 문장이 보여요 · ' + (i + 1) + " / " + total + "번째 카드</p>";
+    if (kc >= total) {
+      h += '<div class="btn-row" style="margin-top:12px"><button type="button" class="btn ok" data-act="gotoquiz">퀴즈로 확인하기</button>' +
+        '<button type="button" class="btn ghost" data-act="restart">카드 다시 보기</button></div>';
+    }
+    return h;
+  }
+
+  function renderCardsStage() {
+    var host = document.getElementById("cardsHost");
+    if (!host) { render(); return; }
+    host.innerHTML = cardsInnerHTML();
+  }
+
+  function flipCard() {
+    cards.flipped = !cards.flipped;
+    cards.anim = true;
+    renderCardsStage();
+  }
+  function moveCard(step) {
+    var total = curDay().sentences.length;
+    var next = cards.i + step;
+    if (next < 0 || next >= total) return;
+    cards.i = next;
+    cards.flipped = false;
+    cards.anim = true;
+    renderCardsStage();
+  }
+  function toggleKnown() {
+    var i = cards.i;
+    var p = progOf(dayId());
+    var at = p.known.indexOf(i);
+    if (at >= 0) {
+      p.known.splice(at, 1);
+      if (p.celebrated) p.celebrated = false;
+      saveProg();
+      renderCardsStage();
+      renderDayTabs();
+      renderPanelHead();
+      toast("‘외웠어요’를 해제했어요");
+      return;
+    }
+    p.known.push(i);
+    p.known.sort(function (a, b) { return a - b; });
+    saveProg();
+    renderCardsStage();
+    renderDayTabs();
+    renderPanelHead();
+    celebrateIfDone();
+    var total = curDay().sentences.length;
+    if (knownCount() >= total) toast("카드 " + total + "장을 모두 외웠어요! 퀴즈로 확인해 보세요");
+  }
+  function restartCards() {
+    cards.i = 0;
+    cards.flipped = false;
+    cards.anim = true;
+    renderCardsStage();
+    toast("카드를 처음부터 다시 볼게요");
+  }
+
+  /* ============ 복습 퀴즈 ============ */
+  function initQuiz(force) {
+    var d = curDay();
+    if (force || !quiz || quiz.day !== state.day) {
+      var answers = [];
+      for (var i = 0; i < d.quiz.length; i++) {
+        var row = [];
+        for (var b = 0; b < d.quiz[i].answers.length; b++) row.push("");
+        answers.push(row);
+      }
+      quiz = { day: state.day, answers: answers, results: null, hints: {}, opts: {} };
+    }
+  }
+  function blankWidth(item, b) {
+    var maxLen = 4;
+    for (var i = 0; i < item.answers[b].length; i++) {
+      if (item.answers[b][i].length > maxLen) maxLen = item.answers[b][i].length;
+    }
+    var w = maxLen * 11 + 42;
+    if (w < 100) w = 100;
+    if (w > 200) w = 200;
+    return w;
+  }
+  function blankHTML(item, i, b) {
+    var val = quiz.answers[i][b] || "";
+    var cls = "";
+    if (quiz.results) cls = quiz.results[i].blanks[b] ? " ok" : " bad";
+    return '<input class="blank' + cls + '" type="text" inputmode="text" autocomplete="off" autocorrect="off" ' +
+      'autocapitalize="off" spellcheck="false" data-q="' + i + '" data-b="' + b + '" ' +
+      'value="' + escAttr(val) + '" style="width:' + blankWidth(item, b) + 'px" aria-label="' + (i + 1) + "번 문제 " + (b + 1) + '번 빈칸">';
+  }
+  function stemHTML(item, i) {
+    var parts = item.text.split("{}");
+    var h = "";
+    for (var b = 0; b < parts.length; b++) {
+      h += esc(parts[b]);
+      if (b < parts.length - 1) h += blankHTML(item, i, b);
+    }
+    return h;
+  }
+  function solutionHTML(item) {
+    var parts = item.text.split("{}");
+    var h = "";
+    for (var b = 0; b < parts.length; b++) {
+      h += esc(parts[b]);
+      if (b < parts.length - 1) h += "<b>" + esc(item.answers[b][0]) + "</b>";
+    }
+    return h;
+  }
+  function answerText(item) {
+    var out = [];
+    for (var b = 0; b < item.answers.length; b++) out.push("«" + item.answers[b][0] + "»");
+    return out.join(" / ");
+  }
+  function optsHTML(item, i) {
+    if (!quiz.opts[i] || !item.options) return "";
+    var h = "";
+    for (var b = 0; b < item.options.length; b++) {
+      h += '<div class="opts">';
+      for (var o = 0; o < item.options[b].length; o++) {
+        var opt = item.options[b][o];
+        var sel = norm(quiz.answers[i][b]) === norm(opt) ? " sel" : "";
+        h += '<button type="button" class="opt' + sel + '" data-opt="' + i + "|" + b + "|" + escAttr(opt) + '">' + esc(opt) + "</button>";
+      }
+      h += "</div>";
+    }
+    return h;
+  }
+  function questionHTML(item, i) {
+    var res = quiz.results ? quiz.results[i] : null;
+    var cls = res ? (res.ok ? " ok" : " bad") : "";
+    var h = '<div class="q' + cls + '">';
+    h += '<div class="q-head"><span class="qnum">Q' + (i + 1) + "</span>";
+    if (res) h += '<span class="qmark ' + (res.ok ? "ok" : "bad") + '">' + (res.ok ? "✓ 정답" : "✗ 오답") + "</span>";
+    h += "</div>";
+    h += '<div class="stem">' + stemHTML(item, i) + "</div>";
+    h += '<div class="qacts">';
+    h += '<button type="button" class="mini' + (quiz.hints[i] ? " on" : "") + '" data-act="hint" data-i="' + i + '">💡 힌트</button>';
+    if (item.options) h += '<button type="button" class="mini' + (quiz.opts[i] ? " on" : "") + '" data-act="opts" data-i="' + i + '">' + (quiz.opts[i] ? "선택지 닫기" : "선택지 보기") + "</button>";
+    h += "</div>";
+    if (quiz.hints[i] && item.hint) h += '<div class="hint">' + esc(item.hint) + "</div>";
+    h += optsHTML(item, i);
+    if (res) {
+      if (res.ok) {
+        h += '<div class="res ok"><b>✓ 맞았어요!</b><div class="expl">' + esc(item.expl) + "</div></div>";
+      } else {
+        h += '<div class="res bad"><b>✗ 정답은 ' + esc(answerText(item)) + "</b>";
+        h += '<div class="full">완성: ' + solutionHTML(item) + "</div>";
+        h += '<div class="expl">' + esc(item.expl) + "</div></div>";
+      }
+    }
+    h += "</div>";
+    return h;
+  }
+  function scoreHTML() {
+    var total = quiz.results.length;
+    var n = 0;
+    for (var i = 0; i < quiz.results.length; i++) if (quiz.results[i].ok) n++;
+    var msg = n === total ? "완벽해요! 오늘 3문장은 내 것이 됐어요 🎉"
+      : n >= total - 2 ? "아주 좋아요! 틀린 문제만 다시 보면 돼요 👏"
+      : n >= total / 2 ? "좋아요, 조금만 더 다듬으면 완성돼요"
+      : "괜찮아요. 플래시카드로 한 번 더 보고 다시 풀어 봐요";
+    var best = progOf(dayId()).best;
+    var h = '<section class="score">';
+    h += '<div class="big">' + n + "<small>/" + total + "</small></div>";
+    h += '<div class="msg">' + esc(msg) + "</div>";
+    h += '<div class="sub">최고 기록 ' + best + "/" + total + " · 점수는 이 기기에 저장돼요</div>";
+    h += "</section>";
+    return h;
+  }
+  function quizInnerHTML() {
+    var d = curDay();
+    var h = "";
+    if (quiz.results) h += scoreHTML();
+    else {
+      h += '<section class="card"><h3 style="margin:0 0 6px;font-size:15.5px;font-weight:800">복습 퀴즈 · ' + d.quiz.length + '문제</h3>';
+      h += '<p class="lead">빈칸에 답을 직접 입력해 보세요. 막히면 💡 힌트, 보기가 필요하면 선택지 버튼을 누르면 돼요. 다 풀고 <b>채점하기</b>를 누르면 바로 정답과 해설이 나와요.</p>';
+      h += '<div class="tip"><b>채점 안내</b> · 대소문자와 마침표는 무시하고, 앞뒤 공백이 있어도 정답으로 처리해요. 한국어로 외우기보다 <b>소리 내어 읽으며</b> 입력해 보세요.</div>';
+      h += "</section>";
+    }
+    for (var i = 0; i < d.quiz.length; i++) h += questionHTML(d.quiz[i], i);
+    h += '<div class="quizfoot">';
+    if (quiz.results) h += '<button type="button" class="btn ghost" data-act="reset">다시 풀기</button>';
+    else h += '<button type="button" class="btn" data-act="grade">채점하기</button>';
+    h += "</div>";
+    return h;
+  }
+  function renderQuizStage() {
+    var host = document.getElementById("quizHost");
+    if (!host) { render(); return; }
+    host.innerHTML = quizInnerHTML();
+  }
+  function collectAnswers() {
+    if (!quiz) return;
+    var inputs = document.querySelectorAll(".blank");
+    for (var i = 0; i < inputs.length; i++) {
+      var q = parseInt(inputs[i].getAttribute("data-q"), 10);
+      var b = parseInt(inputs[i].getAttribute("data-b"), 10);
+      if (quiz.answers[q]) quiz.answers[q][b] = inputs[i].value;
+    }
+  }
+  function grade() {
+    collectAnswers();
+    var d = curDay();
+    var results = [];
+    for (var i = 0; i < d.quiz.length; i++) {
+      var item = d.quiz[i];
+      var blanks = [];
+      var allOk = true;
+      for (var b = 0; b < item.answers.length; b++) {
+        var val = norm(quiz.answers[i][b]);
+        var ok = false;
+        if (val !== "") {
+          for (var a = 0; a < item.answers[b].length; a++) {
+            if (norm(item.answers[b][a]) === val) { ok = true; break; }
+          }
+        }
+        blanks.push(ok);
+        if (!ok) allOk = false;
+      }
+      results.push({ ok: allOk, blanks: blanks });
+    }
+    quiz.results = results;
+
+    var score = 0;
+    for (var r = 0; r < results.length; r++) if (results[r].ok) score++;
+    var p = progOf(dayId());
+    p.last = score;
+    if (score > p.best) p.best = score;
+    saveProg();
+
+    renderQuizStage();
+    renderDayTabs();
+    renderPanelHead();
+    celebrateIfDone();
+    var sc = document.querySelector(".score");
+    if (sc && sc.scrollIntoView) {
+      var y = sc.getBoundingClientRect().top + window.pageYOffset - 76;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  }
+  function resetQuiz() {
+    initQuiz(true);
+    renderQuizStage();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* ============ 렌더 ============ */
+  function render() {
+    var main = document.getElementById("main");
+    var h = '<div id="panelHead">' + panelHeadHTML() + "</div>";
+    if (state.mode === "today") {
+      h += todayHTML();
+    } else if (state.mode === "cards") {
+      initCards(false);
+      h += '<div id="cardsHost">' + cardsInnerHTML() + "</div>";
+    } else {
+      initQuiz(false);
+      h += '<div id="quizHost">' + quizInnerHTML() + "</div>";
+    }
+    main.innerHTML = h;
+    renderDayTabs();
+    renderModeTabs();
+    saveState();
+  }
+
+  function goMode(mode) {
+    if (state.mode === "quiz" && quiz && !quiz.results) collectAnswers();
+    state.mode = mode;
+    render();
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  /* ============ 이벤트 ============ */
+  document.addEventListener("click", function (ev) {
+    var t = ev.target;
+    var el = t && t.closest ? t.closest("[data-day],[data-mode],[data-act],[data-opt]") : null;
+    if (!el) return;
+
+    if (el.hasAttribute("data-day")) {
+      var day = parseInt(el.getAttribute("data-day"), 10);
+      if (day !== state.day) {
+        state.day = day;
+        quiz = null;
+        cards = null;
+        render();
+        window.scrollTo({ top: 0, behavior: "auto" });
+      }
+      return;
+    }
+    if (el.hasAttribute("data-mode")) {
+      var mode = el.getAttribute("data-mode");
+      if (mode !== state.mode) goMode(mode);
+      return;
+    }
+    if (el.hasAttribute("data-opt")) {
+      var parts = el.getAttribute("data-opt").split("|");
+      var qi = parseInt(parts[0], 10);
+      var bi = parseInt(parts[1], 10);
+      var value = parts.slice(2).join("|");
+      collectAnswers();
+      quiz.answers[qi][bi] = value;
+      var inp = document.querySelector('.blank[data-q="' + qi + '"][data-b="' + bi + '"]');
+      if (inp) inp.value = value;
+      var sibs = el.parentNode.querySelectorAll(".opt");
+      for (var k = 0; k < sibs.length; k++) sibs[k].classList.remove("sel");
+      el.classList.add("sel");
+      return;
+    }
+
+    var act = el.getAttribute("data-act");
+    if (!act) return;
+
+    if (act === "speak") { speakSentence(parseInt(el.getAttribute("data-i"), 10), el); return; }
+    if (act === "speakall") { speakDay(el); return; }
+    if (act === "flip") { flipCard(); return; }
+    if (act === "known") { toggleKnown(); return; }
+    if (act === "prev") { moveCard(-1); return; }
+    if (act === "next") { moveCard(1); return; }
+    if (act === "restart") { restartCards(); return; }
+    if (act === "gotocards") { goMode("cards"); return; }
+    if (act === "gotoquiz") { goMode("quiz"); return; }
+    if (act === "hint") {
+      var hi = parseInt(el.getAttribute("data-i"), 10);
+      collectAnswers();
+      quiz.hints[hi] = !quiz.hints[hi];
+      renderQuizStage();
+      return;
+    }
+    if (act === "opts") {
+      var oi = parseInt(el.getAttribute("data-i"), 10);
+      collectAnswers();
+      quiz.opts[oi] = !quiz.opts[oi];
+      renderQuizStage();
+      return;
+    }
+    if (act === "grade") { grade(); return; }
+    if (act === "reset") { resetQuiz(); return; }
+  });
+
+  document.addEventListener("input", function (ev) {
+    var t = ev.target;
+    if (!t || !t.classList || !t.classList.contains("blank")) return;
+    if (!quiz) return;
+    var q = parseInt(t.getAttribute("data-q"), 10);
+    var b = parseInt(t.getAttribute("data-b"), 10);
+    if (quiz.answers[q]) quiz.answers[q][b] = t.value;
+  });
+
+  document.addEventListener("keydown", function (ev) {
+    var t = ev.target;
+    if (t && t.classList && t.classList.contains("blank") && ev.key === "Enter") {
+      ev.preventDefault();
+      var all = Array.prototype.slice.call(document.querySelectorAll(".blank"));
+      var idx = all.indexOf(t);
+      if (idx >= 0 && idx < all.length - 1) all[idx + 1].focus();
+      else {
+        var btn = document.querySelector('[data-act="grade"]');
+        if (btn) btn.click();
+      }
+    }
+    if (t && t.id === "fc" && (ev.key === "Enter" || ev.key === " ")) {
+      ev.preventDefault();
+      flipCard();
+    }
+  });
+
+  /* ============ 시작 ============ */
+  loadAll();
+  render();
+})();
+</script>
+</body>
+</html>
