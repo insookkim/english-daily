@@ -582,7 +582,7 @@
     u.rate = 0.9;
     u.pitch = 1;
     var v = pickVoice();
-    if (v) u.voice = v;
+    if (v && v.localService !== false) u.voice = v;
     return u;
   }
   function setSpeakingBtn(btn, on) {
@@ -608,11 +608,14 @@
       return;
     }
     try {
-      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
       var u = makeUtterance(text);
       u.onend = function () { setSpeakingBtn(btn, false); };
       u.onerror = function () { setSpeakingBtn(btn, false); };
       window.speechSynthesis.speak(u);
+      if (window.speechSynthesis.paused) window.speechSynthesis.resume();
       setSpeakingBtn(btn, true);
     } catch (e) {
       setSpeakingBtn(btn, false);
@@ -631,7 +634,9 @@
       return;
     }
     try {
-      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
       var last = null;
       for (var i = 0; i < list.length; i++) {
         var u = makeUtterance(list[i].en);
@@ -642,6 +647,7 @@
         last = u;
         window.speechSynthesis.speak(u);
       }
+      if (window.speechSynthesis.paused) window.speechSynthesis.resume();
       if (last) setSpeakingBtn(btn, true);
     } catch (e) {
       setSpeakingBtn(btn, false);
